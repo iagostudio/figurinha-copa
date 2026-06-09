@@ -97,51 +97,55 @@ async function criarPagamento() {
 }
 
 async function verificarPagamento() {
-  if (!paymentId) {
-    setMensagem("Pagamento ainda não foi criado.");
-    return;
-  }
-
-  setMensagem("Verificando pagamento...");
-
-  const resposta = await fetch("/api/verificar-pagamento", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      paymentId,
-    }),
-  });
-
-  const dados = await resposta.json();
-
-  if (!resposta.ok) {
-    setMensagem(dados.error || "Erro ao verificar pagamento.");
-    return;
-  }
-
-  setMensagem(dados.message);
-
-  if (dados.aprovado) {
-    setPagamentoAprovado(true);
-    setMensagem("Pagamento aprovado! Sua figurinha foi liberada.");
-
-    if (
-      !eventoCompraEnviado &&
-      typeof window !== "undefined" &&
-      (window as any).fbq
-    ) {
-      (window as any).fbq("track", "Purchase", {
-        value: 12.9,
-        currency: "BRL",
-        content_name: "Figurinha personalizada",
-        content_type: "product",
-      });
-
-      setEventoCompraEnviado(true);
+  try {
+    if (!paymentId) {
+      setMensagem("Nenhum pagamento encontrado para verificar.");
+      return;
     }
+
+    setMensagem("Verificando pagamento...");
+
+    const response = await fetch("/api/verificar-pagamento", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ paymentId }),
+    });
+
+    const dados = await response.json();
+
+    if (!response.ok) {
+      setMensagem(dados.error || "Erro ao verificar pagamento.");
+      return;
+    }
+
+    if (dados.aprovado) {
+      setPagamentoAprovado(true);
+      setMensagem("Pagamento aprovado! Sua figurinha foi liberada.");
+
+      if (
+        !eventoCompraEnviado &&
+        typeof window !== "undefined" &&
+        (window as any).fbq
+      ) {
+        (window as any).fbq("track", "Purchase", {
+          value: 0.1,
+          currency: "BRL",
+          content_name: "Figurinha personalizada",
+          content_type: "product",
+        });
+
+        setEventoCompraEnviado(true);
+      }
+    } else {
+      setMensagem("Pagamento ainda não foi aprovado. Aguarde alguns segundos e tente novamente.");
+    }
+  } catch (error) {
+    console.error("Erro ao verificar pagamento:", error);
+    setMensagem("Erro ao verificar pagamento. Tente novamente.");
   }
+}
 
 async function consultarStatusPedido() {
   if (!orderId) {

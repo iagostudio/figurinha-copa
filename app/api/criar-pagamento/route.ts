@@ -28,7 +28,7 @@ export async function POST(req: Request) {
         "X-Idempotency-Key": orderId,
       },
       body: JSON.stringify({
-        transaction_amount: 12.9,
+        transaction_amount: 0.1,
         description: "Figurinha personalizada estilo futebol",
         payment_method_id: "pix",
         payer: {
