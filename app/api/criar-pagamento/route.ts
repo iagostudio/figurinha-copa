@@ -1,21 +1,4 @@
 import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
-
-const pedidosPath = path.join(process.cwd(), "pedidos.json");
-
-function lerPedidos() {
-  if (!fs.existsSync(pedidosPath)) {
-    return {};
-  }
-
-  const conteudo = fs.readFileSync(pedidosPath, "utf-8");
-  return JSON.parse(conteudo || "{}");
-}
-
-function salvarPedidos(pedidos: any) {
-  fs.writeFileSync(pedidosPath, JSON.stringify(pedidos, null, 2));
-}
 
 export async function POST(req: Request) {
   try {
@@ -28,7 +11,9 @@ export async function POST(req: Request) {
       );
     }
 
-    if (!process.env.MERCADOPAGO_ACCESS_TOKEN) {
+    const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
+
+    if (!accessToken) {
       return NextResponse.json(
         { error: "Token do Mercado Pago não configurado." },
         { status: 500 }
@@ -38,7 +23,7 @@ export async function POST(req: Request) {
     const response = await fetch("https://api.mercadopago.com/v1/payments", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}`,
+        Authorization: `Bearer ${accessToken}`,
         "Content-Type": "application/json",
         "X-Idempotency-Key": orderId,
       },
@@ -68,19 +53,6 @@ export async function POST(req: Request) {
       );
     }
 
-        const pedidos: any = lerPedidos();
-
-    pedidos[orderId] = {
-      orderId,
-      paymentId: payment.id,
-      status: payment.status,
-      pago: false,
-      criadoEm: new Date().toISOString(),
-    };
-
-    salvarPedidos(pedidos);
-
-
     return NextResponse.json({
       success: true,
       message: "Pix gerado com sucesso!",
@@ -92,9 +64,7 @@ export async function POST(req: Request) {
         payment.point_of_interaction?.transaction_data?.qr_code_base64,
     });
   } catch (error) {
-    console.error("Erro ao criar pagamento:", error);
-
-
+    console.error("Erro interno ao criar pagamento:", error);
 
     return NextResponse.json(
       { error: "Erro interno ao criar pagamento." },
