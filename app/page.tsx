@@ -18,6 +18,7 @@ export default function Home() {
   const [mostrarConfirmacao, setMostrarConfirmacao] = useState(false);
   const [qrCodeBase64, setQrCodeBase64] = useState("");
   const [paymentId, setPaymentId] = useState("");
+  const [eventoCompraEnviado, setEventoCompraEnviado] = useState(false);
 
   function abrirConfirmacao() {
   if (!foto || !nome) {
@@ -124,8 +125,23 @@ async function verificarPagamento() {
 
   if (dados.aprovado) {
     setPagamentoAprovado(true);
+    setMensagem("Pagamento aprovado! Sua figurinha foi liberada.");
+
+    if (
+      !eventoCompraEnviado &&
+      typeof window !== "undefined" &&
+      (window as any).fbq
+    ) {
+      (window as any).fbq("track", "Purchase", {
+        value: 12.9,
+        currency: "BRL",
+        content_name: "Figurinha personalizada",
+        content_type: "product",
+      });
+
+      setEventoCompraEnviado(true);
+    }
   }
-}
 
 async function consultarStatusPedido() {
   if (!orderId) {
