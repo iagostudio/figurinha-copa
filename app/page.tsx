@@ -130,7 +130,7 @@ async function verificarPagamento() {
         (window as any).fbq
       ) {
         (window as any).fbq("track", "Purchase", {
-          value: 0.1,
+          value: 12.9,
           currency: "BRL",
           content_name: "Figurinha personalizada",
           content_type: "product",
