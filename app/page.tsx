@@ -186,7 +186,7 @@ async function consultarStatusPedido() {
               type="file"
               accept="image/*"
               onChange={(e) => setFoto(e.target.files?.[0] || null)}
-              className="w-full rounded-xl bg-white p-3 text-black"
+              className="w-full rounded-xl bg-white px-4 py-3 text-black file:mr-4 file:rounded-lg file:border-0 file:bg-yellow-400 file:px-4 file:py-2 file:font-bold file:text-green-950"
             />
             <p className="mt-1 text-sm text-white/80">
               Envie uma foto com rosto nítido, boa iluminação e olhando para frente.
@@ -194,40 +194,45 @@ async function consultarStatusPedido() {
           </div>
 
           <input
+            type="text"
+            placeholder="Nome da pessoa obrigatório"
             value={nome}
             onChange={(e) => setNome(e.target.value)}
-            placeholder="Nome da pessoa obrigatório"
-            className="w-full rounded-xl p-3 text-black"
+            className="w-full rounded-xl border border-white/30 bg-white px-4 py-3 text-black placeholder:text-gray-500 outline-none"
           />
 
           <input
+            type="text"
+            placeholder="Data de nascimento (opcional)"
             value={nascimento}
             onChange={(e) => setNascimento(e.target.value)}
-            placeholder="Data de nascimento (opcional)"
-            className="w-full rounded-xl p-3 text-black"
+            className="w-full rounded-xl border border-white/30 bg-white px-4 py-3 text-black placeholder:text-gray-500 outline-none"
           />
 
           <div className="grid grid-cols-2 gap-3">
             <input
+              type="text"
+              placeholder="Altura (opcional)"
               value={altura}
               onChange={(e) => setAltura(e.target.value)}
-              placeholder="Altura (opcional)"
-              className="w-full rounded-xl p-3 text-black"
+              className="w-full rounded-xl border border-white/30 bg-white px-4 py-3 text-black placeholder:text-gray-500 outline-none"
             />
 
             <input
+              type="text"
+              placeholder="Peso (opcional)"
               value={peso}
               onChange={(e) => setPeso(e.target.value)}
-              placeholder="Peso (opcional)"
-              className="w-full rounded-xl p-3 text-black"
+              className="w-full rounded-xl border border-white/30 bg-white px-4 py-3 text-black placeholder:text-gray-500 outline-none"
             />
           </div>
 
           <input
+            type="text"
+            placeholder="Time do coração (opcional)"
             value={time}
             onChange={(e) => setTime(e.target.value)}
-            placeholder="Time do coração (opcional)"
-            className="w-full rounded-xl p-3 text-black"
+            className="w-full rounded-xl border border-white/30 bg-white px-4 py-3 text-black placeholder:text-gray-500 outline-none"
           />
 
           <button
@@ -310,12 +315,7 @@ async function consultarStatusPedido() {
                     Já paguei, verificar pagamento
                   </button>
 
-                  <button
-                    onClick={consultarStatusPedido}
-                    className="mt-3 w-full rounded-2xl bg-purple-600 px-4 py-3 font-black text-white"
-                  >
-                    Consultar liberação automática
-                  </button>
+                 
                 </div>
               )}
 
