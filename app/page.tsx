@@ -19,6 +19,7 @@ export default function Home() {
   const [qrCodeBase64, setQrCodeBase64] = useState("");
   const [paymentId, setPaymentId] = useState("");
   const [eventoCompraEnviado, setEventoCompraEnviado] = useState(false);
+  const [carregando, setCarregando] = useState(false);
 
   function abrirConfirmacao() {
   if (!foto || !nome) {
@@ -37,37 +38,43 @@ export default function Home() {
 }
 
 async function gerarFigurinha() {
-  setMostrarConfirmacao(false);
-  setMensagem("Enviando dados para o backend...");
+  try {
+    setCarregando(true);
+    setMensagem("Estamos criando sua figurinha personalizada no estilo da Copa. Aguarde alguns instantes...");
 
-  const formData = new FormData();
+    const formData = new FormData();
 
-  if (foto) {
-    formData.append("foto", foto);
+    if (foto) {
+      formData.append("foto", foto);
+    }
+
+    formData.append("nome", nome);
+    formData.append("nascimento", nascimento);
+    formData.append("altura", altura);
+    formData.append("peso", peso);
+    formData.append("time", time);
+
+    const response = await fetch("/api/gerar-figurinha", {
+      method: "POST",
+      body: formData,
+    });
+
+    const dados = await response.json();
+
+    if (!response.ok) {
+      setMensagem(dados.error || "Não foi possível criar sua figurinha. Tente novamente.");
+      return;
+    }
+
+    setPreviewUrl(dados.previewUrl);
+    setOrderId(dados.orderId);
+    setMensagem("Sua figurinha está pronta! Confira a prévia abaixo.");
+  } catch (error) {
+    console.error("Erro ao gerar figurinha:", error);
+    setMensagem("Não foi possível criar sua figurinha agora. Tente novamente em alguns instantes.");
+  } finally {
+    setCarregando(false);
   }
-
-  formData.append("nome", nome);
-  formData.append("nascimento", nascimento);
-  formData.append("altura", altura);
-  formData.append("peso", peso);
-  formData.append("time", time);
-
-  const resposta = await fetch("/api/gerar-figurinha", {
-    method: "POST",
-    body: formData,
-  });
-
-  const dados = await resposta.json();
-
-  if (!resposta.ok) {
-    setMensagem(dados.error || "Erro ao gerar figurinha.");
-    return;
-  }
-
-  setMensagem(dados.message);
-  setConfirmacao(dados.confirmacao);
-  setPreviewUrl(dados.previewUrl);
-  setOrderId(dados.orderId);
 }
 
 async function criarPagamento() {
@@ -257,14 +264,22 @@ async function consultarStatusPedido() {
 
           <button
             onClick={abrirConfirmacao}
-            className="w-full rounded-2xl bg-yellow-300 px-6 py-4 text-lg font-black text-green-950"
+            disabled={carregando}
+            className="w-full rounded-xl bg-yellow-400 px-6 py-4 font-bold text-green-950 disabled:cursor-not-allowed disabled:opacity-70"
           >
-            Gerar minha figurinha
+            {carregando ? "Criando sua figurinha..." : "Gerar minha figurinha"}
           </button>
 
           {mensagem && (
-            <div className="rounded-xl bg-white/20 p-4 text-center font-semibold">
-              {mensagem}
+            <div className="mt-4 rounded-xl bg-white/10 p-4 text-center text-sm font-semibold text-white">
+              {carregando ? (
+                <div className="flex flex-col items-center gap-3">
+                  <div className="h-8 w-8 animate-spin rounded-full border-4 border-yellow-400 border-t-transparent"></div>
+                  <p>{mensagem}</p>
+                </div>
+              ) : (
+                <p>{mensagem}</p>
+              )}
             </div>
           )}
 
