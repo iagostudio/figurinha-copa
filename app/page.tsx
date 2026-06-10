@@ -39,6 +39,7 @@ export default function Home() {
 
 async function gerarFigurinha() {
   try {
+    setMostrarConfirmacao(false);
     setCarregando(true);
     setMensagem("Estamos criando sua figurinha personalizada no estilo da Copa. Aguarde alguns instantes...");
 
@@ -68,6 +69,7 @@ async function gerarFigurinha() {
 
     setPreviewUrl(dados.previewUrl);
     setOrderId(dados.orderId);
+    setConfirmacao("");
     setMensagem("Sua figurinha está pronta! Confira a prévia abaixo.");
   } catch (error) {
     console.error("Erro ao gerar figurinha:", error);
@@ -408,9 +410,10 @@ async function consultarStatusPedido() {
 
         <button
           onClick={gerarFigurinha}
-          className="w-1/2 rounded-2xl bg-yellow-300 px-4 py-3 font-black text-green-950"
+          disabled={carregando}
+          className="flex-1 rounded-2xl bg-yellow-400 px-6 py-4 font-bold text-green-950 shadow-lg transition hover:bg-yellow-300 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          Confirmar e gerar
+          {carregando ? "Gerando..." : "Confirmar e gerar"}
         </button>
       </div>
     </div>
